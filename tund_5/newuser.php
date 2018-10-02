@@ -55,13 +55,19 @@
 	  $birthDate = date_create($_POST["birthMonth"] ."/" .$_POST["birthDay"] ."/" .$_POST["birthYear"]);
 	  //vormindame andmebaasi jaoks sobivaks
 	  $birthDate = date_format($birthDate, "Y-m-d");
-	  echo $birthDate;
+	  //echo $birthDate;
     } else {
 	  $birthDateError = "Kahjuks on sisestatud võimatu kuupäev!";	
 	}
   }//kuupäeva legaalsuse kontroll lõppeb
   
- 
+  
+  
+  //kõik kontrollid tehtud
+  if(empty($firstNameError) and empty($lastNameError) and empty($birthMonthError) and empty($birthYearError) and empty($birthDayError) and empty($birthDateError) and empty($genderError) and empty($emailError) and empty($passwordError)){
+	$notice = signup($firstName, $lastName, $birthDate, $gender, $_POST["email"], $_POST["password"]);
+  }  
+
   }//kas on üldse nuppu vajutatud lõppeb
 ?>
 <!DOCTYPE html>
@@ -136,6 +142,8 @@
 	  
 	  <input type="submit" name="submitUserData" value="Loo kasutaja">
   </form>
+  <hr>
+  <p><?php echo $notice; ?></p>
   
 </body>
 </html>

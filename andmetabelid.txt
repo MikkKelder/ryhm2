@@ -2,3 +2,7 @@ anonüümsete sõnumite tabel
 
 CREATE TABLE `if18_rinde`.`vpamsg2` ( `id` INT(11) NOT NULL AUTO_INCREMENT , `message` VARCHAR(256) NOT NULL , `created` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP , `accepted` INT(1) NULL , `acceptedby` INT(11) NULL , `accepttime` TIMESTAMP NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB;
 
+
+Kasutajate tabel
+
+CREATE TABLE `if18_rinde`.`vpusers2` ( `id` INT(11) NOT NULL AUTO_INCREMENT , `firstname` VARCHAR(30) NOT NULL , `lastname` VARCHAR(30) NOT NULL , `birthdate` DATE NOT NULL , `gender` INT(1) NOT NULL , `email` VARCHAR(100) NOT NULL , `password` VARCHAR(60) NOT NULL , `created` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP , PRIMARY KEY (`id`)) ENGINE = InnoDB;
