@@ -13,17 +13,56 @@
   
   $monthNamesET = ["jaanuar", "veebruar", "märts", "aprill", "mai", "juuni","juuli", "august", "september", "oktoober", "november", "detsember"];
   
+  $firstNameError = "";
+  $lastNameError = "";
+  $birthMonthError = "";
+  $birthYearError = "";
+  $birthDayError = "";
+  $birthDateError = "";
+  $genderError = "";
+  $emailError = "";
+  $passwordError = "";
+  
   
   //püüan POST andmed kinni
-  //var_dump($_POST);
-  if (isset($_POST["firstname"])){
+  if(isset($_POST["submitUserData"])){//kas on üldse nuppu vajutatud
+  
+  if (isset($_POST["firstname"]) and !empty($_POST["firstname"])){
 	$firstName = test_input($_POST["firstname"]);
+  } else {
+	$firstNameError = "Palun sisesta oma eesnimi!";  
   }
+  
   if (isset($_POST["lastname"])){
 	$lastName = test_input($_POST["lastname"]);
   }
- 
   
+  //soo kontroll
+  if(isset($_POST["gender"]) and !empty($_POST["gender"])){
+	$gender = intval($_POST["gender"]);
+  } else {
+	$genderError = "Palun märgi oma sugu!";  
+  }//soo kontroll lõppeb
+  
+  //tuleks kontrollida kuupäeva osi
+  
+  //kontrollime, kas saab legaalse kuupäeva ja paneme osad kokku
+  if(!empty($_POST["birthDay"]) and !empty($_POST["birthMonth"]) and !empty($_POST["birthYear"])){
+	//kontrollime kuupäeva valiidsust
+	//checkdate ootab kolme täisarvu: kuu, päev, aasta
+	if(checkdate(intval($_POST["birthMonth"]), intval($_POST["birthDay"]), intval($_POST["birthYear"]))){
+      //paneme kolm arvu kuupäevaks kokku
+	  $birthDate = date_create($_POST["birthMonth"] ."/" .$_POST["birthDay"] ."/" .$_POST["birthYear"]);
+	  //vormindame andmebaasi jaoks sobivaks
+	  $birthDate = date_format($birthDate, "Y-m-d");
+	  echo $birthDate;
+    } else {
+	  $birthDateError = "Kahjuks on sisestatud võimatu kuupäev!";	
+	}
+  }//kuupäeva legaalsuse kontroll lõppeb
+  
+ 
+  }//kas on üldse nuppu vajutatud lõppeb
 ?>
 <!DOCTYPE html>
 <html>
@@ -38,7 +77,7 @@
   
   <form method="POST" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
     <label>Eesnimi: </label><br>
-    <input type="text" name="firstname"><br>
+    <input type="text" name="firstname" value="<?php echo $firstName; ?>"><span><?php echo $firstNameError; ?></span><br>
     <label>Perekonnanimi: </label><br>
     <input type="text" name="lastname"><br>
 	<label>Sünnipäev: </label>
@@ -83,10 +122,13 @@
 	  ?>
 	  <br>
 	  <label>Sugu:</label><br>
-	  <input name="gender" type="radio" value="2"><label>Naine</label>
+	  <input name="gender" type="radio" value="2" <?php if($gender == 2){echo "checked";}?>><label>Naine</label>
 	  <br>
-	  <input name="gender" type="radio" value="1"><label>Mees</label>
+	  <input name="gender" type="radio" value="1" <?php if($gender == 1){echo "checked";}?>><label>Mees</label>
 	  <br>
+	  <span><?php echo $genderError; ?></span>
+	  <br>
+	  
 	  <label>E-postiaadress (kasutajatunnuseks): </label><br>
       <input type="email" name="email"><br>
       <label>Salasõna (min 8 märki): </label><br>
