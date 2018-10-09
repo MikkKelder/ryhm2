@@ -3,14 +3,17 @@
   $database = "if18_rinde";
   //echo $serverHost;
   
+  //kasutan sessiooni
+  session_start();
+  
   //sisselogimine
   function signin($email, $password){
 	$notice = "";
 	$mysqli = new mysqli($GLOBALS["serverHost"], $GLOBALS["serverUsername"], $GLOBALS["serverPassword"], $GLOBALS["database"]);
-	$stmt = $mysqli->prepare("SELECT password FROM vpusers2 WHERE email=?");
+	$stmt = $mysqli->prepare("SELECT id, firstname, lastname, password FROM vpusers2 WHERE email=?");
 	echo $mysqli->error;
 	$stmt->bind_param("s", $email);
-	$stmt->bind_result($passwordFromDb);
+	$stmt->bind_result($idFromDb, $firstnameFromDb, $lastnameFromDb, $passwordFromDb);
 	if($stmt->execute()){
 	  //andmebaasi päring õnnestus
 	  if($stmt->fetch()){
@@ -18,6 +21,16 @@
 		if(password_verify($password, $passwordFromDb)){
 		  //parool õige
 		  $notice = "Olete õnnelikult sisse loginud!";
+		  //määrame sessioonimuutujad
+		  $_SESSION["userId"] = $idFromDb;
+		  $_SESSION["lastName"] = $lastnameFromDb;
+		  $_SESSION["firstName"] = $firstnameFromDb;
+		  
+		  $stmt->close();
+	      $mysqli->close();
+		  header("Location: main.php");
+		  exit();
+		  
 		} else {
 		  $notice = "Kahjuks vale salasõna!";
 		}
@@ -27,7 +40,6 @@
 	} else {
 	  $notice = "Sisselogimisel tekkis tehniline viga!" .$stmt->error;
 	}
-	
 	
 	$stmt->close();
 	$mysqli->close();
