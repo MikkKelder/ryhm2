@@ -3,6 +3,37 @@
   $database = "if18_rinde";
   //echo $serverHost;
   
+  //sisselogimine
+  function signin($email, $password){
+	$notice = "";
+	$mysqli = new mysqli($GLOBALS["serverHost"], $GLOBALS["serverUsername"], $GLOBALS["serverPassword"], $GLOBALS["database"]);
+	$stmt = $mysqli->prepare("SELECT password FROM vpusers2 WHERE email=?");
+	echo $mysqli->error;
+	$stmt->bind_param("s", $email);
+	$stmt->bind_result($passwordFromDb);
+	if($stmt->execute()){
+	  //andmebaasi päring õnnestus
+	  if($stmt->fetch()){
+		//kasutaja on olemas
+		if(password_verify($password, $passwordFromDb)){
+		  //parool õige
+		  $notice = "Olete õnnelikult sisse loginud!";
+		} else {
+		  $notice = "Kahjuks vale salasõna!";
+		}
+	  } else {
+		$notice = "Kahjuks sellise kasutajatunnusega (" .$email .") kasutajat ei leitud!";  
+	  }
+	} else {
+	  $notice = "Sisselogimisel tekkis tehniline viga!" .$stmt->error;
+	}
+	
+	
+	$stmt->close();
+	$mysqli->close();
+	return $notice;
+  }
+  
   //kasutaja salvestamine
   function signup($name, $surname, $email, $gender, $birthDate, $password){
 	$notice = "";

@@ -1,20 +1,19 @@
 <?php
-  //lisan teise php faili
   require("functions.php");
   $notice = "";
-  $firstName = "";
-  $lastName = "";
+  $name = "";
+  $surname = "";
+  $email = "";
+  $gender = "";
   $birthMonth = null;
   $birthYear = null;
   $birthDay = null;
-  $birthDate = "";
-  $gender = null;
-  $email = "";
-  
+  $birthDate = null;
   $monthNamesET = ["jaanuar", "veebruar", "märts", "aprill", "mai", "juuni","juuli", "august", "september", "oktoober", "november", "detsember"];
   
-  $firstNameError = "";
-  $lastNameError = "";
+  //muutujad võimalike veateadetega
+  $nameError = "";
+  $surnameError = "";
   $birthMonthError = "";
   $birthYearError = "";
   $birthDayError = "";
@@ -22,88 +21,129 @@
   $genderError = "";
   $emailError = "";
   $passwordError = "";
+  $confirmpasswordError = "";
   
+  //kui on uue kasutaja loomise nuppu vajutatud
+  if(isset($_POST["submitUserData"])){
   
-  //püüan POST andmed kinni
-  if(isset($_POST["submitUserData"])){//kas on üldse nuppu vajutatud
-  
-  if (isset($_POST["firstname"]) and !empty($_POST["firstname"])){
-	$firstName = test_input($_POST["firstname"]);
+  if (isset($_POST["firstName"]) and !empty($_POST["firstName"])){
+	$name = test_input($_POST["firstName"]);
   } else {
-	$firstNameError = "Palun sisesta oma eesnimi!";  
+	  $nameError = "Palun sisesta eesnimi!";
   }
   
-  if (isset($_POST["lastname"])){
-	$lastName = test_input($_POST["lastname"]);
+  if (isset($_POST["surName"]) and !empty($_POST["surName"])){
+	$surname = test_input($_POST["surName"]);
+  } else {
+	  $surnameError = "Palun sisesta perekonnanimi!";
   }
   
-  //soo kontroll
-  if(isset($_POST["gender"]) and !empty($_POST["gender"])){
+  if(isset($_POST["gender"])){
 	$gender = intval($_POST["gender"]);
   } else {
-	$genderError = "Palun märgi oma sugu!";  
-  }//soo kontroll lõppeb
+	  $genderError = "Palun märgi sugu!";
+  }
   
-  //tuleks kontrollida kuupäeva osi
+  //kontrollime, kas sünniaeg sisestati ja kas on korrektne
+  if(isset($_POST["birthDay"]) and !empty($_POST["birthDay"])){
+	  $birthDay = intval($_POST["birthDay"]);
+  } else {
+	  $birthDayError = "Palun vali sünnikuupäev!";
+  }
   
-  //kontrollime, kas saab legaalse kuupäeva ja paneme osad kokku
-  if(!empty($_POST["birthDay"]) and !empty($_POST["birthMonth"]) and !empty($_POST["birthYear"])){
-	//kontrollime kuupäeva valiidsust
-	//checkdate ootab kolme täisarvu: kuu, päev, aasta
-	if(checkdate(intval($_POST["birthMonth"]), intval($_POST["birthDay"]), intval($_POST["birthYear"]))){
-      //paneme kolm arvu kuupäevaks kokku
-	  $birthDate = date_create($_POST["birthMonth"] ."/" .$_POST["birthDay"] ."/" .$_POST["birthYear"]);
-	  //vormindame andmebaasi jaoks sobivaks
-	  $birthDate = date_format($birthDate, "Y-m-d");
+  if(isset($_POST["birthMonth"]) and !empty($_POST["birthMonth"])){
+	  $birthMonth = intval($_POST["birthMonth"]);
+  } else {
+	  $birthMonthError = "Palun vali sünnikuu!";
+  }
+  
+  if(isset($_POST["birthYear"]) and !empty($_POST["birthYear"])){
+	  $birthYear = intval($_POST["birthYear"]);
+  } else {
+	  $birthYearError = "Palun vali sünniaasta!";
+  }
+  
+  //kontrollin kuupäeva õigsust
+  if(!empty($birthDay) and !empty($birthMonth) and !empty($birthYear)){
+	//checkdate(päev, kuu, aasta)
+	if(checkdate($birthMonth, $birthDay, $birthYear)){
+	  $makebirthDate = date_create($birthMonth ."/" .$birthDay ."/" .$birthYear);
+	  $birthDate = date_format($makebirthDate, "Y-m-d");
 	  //echo $birthDate;
-    } else {
-	  $birthDateError = "Kahjuks on sisestatud võimatu kuupäev!";	
-	}
-  }//kuupäeva legaalsuse kontroll lõppeb
+	} else {
+	  $birthDateError = "Kuupäev on vigane!";
+    }
+  }//kui kõik kuupäeva osad on olmemas
   
-  //parooli pikkuse kontroll
-  //strlen($_POST["password"]) >= 8
+  if (isset($_POST["email"]) and !empty($_POST["email"])){
+	//$name = $_POST["firstName"];
+	$email = test_input($_POST["email"]);
+  } else {
+	  $emailError = "Palun sisesta e-postiaadress!";
+  }
   
-  //kõik kontrollid tehtud
-  if(empty($firstNameError) and empty($lastNameError) and empty($birthMonthError) and empty($birthYearError) and empty($birthDayError) and empty($birthDateError) and empty($genderError) and empty($emailError) and empty($passwordError)){
-	$notice = signup($firstName, $lastName, $birthDate, $gender, $_POST["email"], $_POST["password"]);
-  }  
-
-  }//kas on üldse nuppu vajutatud lõppeb
+  if (!isset($_POST["password"]) or empty($_POST["password"])){
+	$passwordError = "Palun sisesta salasõna!";
+  } else {
+	  if(strlen($_POST["password"]) < 8){
+		  $passwordError = "Liiga lühike salasõna (sisestasite ainult " .strlen($_POST["password"]) ." märki).";
+	  }
+  }
+  
+  if (!isset($_POST["confirmpassword"]) or empty($_POST["confirmpassword"])){
+	$confirmpasswordError = "Palun sisestage salasõna kaks korda!";  
+  } else {
+	  if($_POST["confirmpassword"] != $_POST["password"]){
+		  $confirmpasswordError = "Sisestatud salasõnad ei olnud ühesugused!";
+	  }
+  }
+  
+  //kui kõik on korras, siis salvestame kasutaja
+  if(empty($nameError) and empty($surnameError) and empty($birthMonthError) and empty($birthYearError) and empty($birthDayError) and empty($genderError) and empty($emailError) and empty($passwordError) and empty($confirmpasswordError)){
+    $notice = signup($name, $surname, $email, $gender, $birthDate, $_POST["password"]);
+  }
+  
+  }//kui on nuppu vajutatud - lõppeb
 ?>
+
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="utf-8">
-  <title>Uue kasutaja loomine</title>
-</head>
-<body>
-  <h1>Loo kasutaja</h1>
-  <p>Siin on minu <a href="http://www.tlu.ee">TLÜ</a> õppetöö raames valminud veebilehed. Need ei oma mingit sügavat sisu ja nende kopeerimine ei oma mõtet.</p>
-  <hr>
-  
-  <form method="POST" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
-    <label>Eesnimi: </label><br>
-    <input type="text" name="firstname" value="<?php echo $firstName; ?>"><span><?php echo $firstNameError; ?></span><br>
-    <label>Perekonnanimi: </label><br>
-    <input type="text" name="lastname"><br>
-	<label>Sünnipäev: </label>
-	  <?php
-	    echo '<select name="birthDay">' ."\n";
-		echo '<option value="" selected disabled>Päev</option>' ."\n";
-		for ($i = 1; $i < 32; $i ++){
-			echo '<option value="' .$i .'"';
-			if ($i == $birthDay){
-				echo " selected ";
+  <head>
+    <meta charset="utf-8">
+	<title>Katselise veebi uue kasutaja loomine</title>
+  </head>
+  <body>
+    <h1>Loo endale kasutajakonto</h1>
+	<p>See leht on valminud <a href="http://www.tlu.ee" target="_blank">TLÜ</a> õppetöö raames ja ei oma mingisugust, mõtestatud või muul moel väärtuslikku sisu.</p>
+	<hr>
+	
+	<form method="POST" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
+	  <label>Eesnimi:</label><br>
+	  <input name="firstName" type="text" value="<?php echo $name; ?>"><span><?php echo $nameError; ?></span><br>
+      <label>Perekonnanimi:</label><br>
+	  <input name="surName" type="text" value="<?php echo $surname; ?>"><span><?php echo $surnameError; ?></span><br>
+	  
+	  <input type="radio" name="gender" value="2" <?php if($gender == "2"){		echo " checked";} ?>><label>Naine</label>
+	  <input type="radio" name="gender" value="1" <?php if($gender == "1"){		echo " checked";} ?>><label>Mees</label><br>
+	  <span><?php echo $genderError; ?></span><br>
+	  
+	  <label>Sünnipäev: </label>
+		  <?php
+			echo '<select name="birthDay">' ."\n";
+			echo '<option value="" selected disabled>päev</option>' ."\n";
+			for ($i = 1; $i < 32; $i ++){
+				echo '<option value="' .$i .'"';
+				if ($i == $birthDay){
+					echo " selected ";
+				}
+				echo ">" .$i ."</option> \n";
 			}
-			echo ">" .$i ."</option> \n";
-		}
-		echo "</select> \n";
-	  ?>
+			echo "</select> \n";
+		  ?>
 	  <label>Sünnikuu: </label>
 	  <?php
 	    echo '<select name="birthMonth">' ."\n";
-		echo '<option value="" selected disabled>Kuu</option>' ."\n";
+		echo '<option value="" selected disabled>kuu</option>' ."\n";
 		for ($i = 1; $i < 13; $i ++){
 			echo '<option value="' .$i .'"';
 			if ($i == $birthMonth){
@@ -114,10 +154,9 @@
 		echo "</select> \n";
 	  ?>
 	  <label>Sünniaasta: </label>
-	  <!--<input name="birthYear" type="number" min="1914" max="2003" value="1998">-->
 	  <?php
 	    echo '<select name="birthYear">' ."\n";
-		echo '<option value="" selected disabled>Aasta</option>' ."\n";
+		echo '<option value="" selected disabled>aasta</option>' ."\n";
 		for ($i = date("Y") - 15; $i >= date("Y") - 100; $i --){
 			echo '<option value="' .$i .'"';
 			if ($i == $birthYear){
@@ -128,30 +167,19 @@
 		echo "</select> \n";
 	  ?>
 	  <br>
-	  <label>Sugu:</label><br>
-	  <input name="gender" type="radio" value="2" <?php if($gender == 2){echo "checked";}?>><label>Naine</label>
-	  <br>
-	  <input name="gender" type="radio" value="1" <?php if($gender == 1){echo "checked";}?>><label>Mees</label>
-	  <br>
-	  <span><?php echo $genderError; ?></span>
+	  <span><?php echo $birthDateError ." " .$birthDayError ." " .$birthMonthError ." " .$birthYearError; ?></span>
 	  <br>
 	  
-	  <label>E-postiaadress (kasutajatunnuseks): </label><br>
-      <input type="email" name="email"><br>
-      <label>Salasõna (min 8 märki): </label><br>
-      <input type="password" name="password"><br>
-	  
-	  <input type="submit" name="submitUserData" value="Loo kasutaja">
-  </form>
-  <hr>
-  <p><?php echo $notice; ?></p>
-  
-</body>
+	  <label>E-mail (kasutajatunnus):</label><br>
+	  <input type="email" name="email" value="<?php echo $email; ?>"><span><?php echo $emailError; ?></span><br>
+	  <label>Salasõna (min 8 tähemärki):</label><br>
+	  <input name="password" type="password"><span><?php echo $passwordError; ?></span><br>
+	  <label>Korrake salasõna:</label><br>
+	  <input name="confirmpassword" type="password"><span><?php echo $confirmpasswordError; ?></span><br>
+	  <input name="submitUserData" type="submit" value="Loo kasutaja"><span><?php echo $notice; ?></span>
+	</form>
+	<hr>
+	<p><a href="index_2.php">Tagasi</a> avalehele!</p>
+	
+  </body>
 </html>
-
-
-
-
-
-
-
