@@ -1,5 +1,20 @@
 <?php
   require("functions.php");
+  
+  //kui pole sisse loginud
+  if(!isset($_SESSION["userId"])){
+	header("Location: index_2.php");
+    exit();	
+  }
+  
+  //välja logimine
+  if(isset($_GET["logout"])){
+	session_destroy();
+	header("Location: index_2.php");
+    exit();
+  }
+  
+  $msglist = readallunvalidatedmessages();
 
 ?>
 <!DOCTYPE html>
@@ -18,7 +33,7 @@
   </ul>
   <hr>
   
-  <?php echo $notice; ?>
+  <?php echo $msglist; ?>
 
 </body>
 </html>

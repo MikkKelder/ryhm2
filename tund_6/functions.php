@@ -6,6 +6,42 @@
   //kasutan sessiooni
   session_start();
   
+  //valitud sõnumi lugemine valideerimiseks
+  function readmsgforvalidation($editId){
+	$notice = "";
+	$mysqli = new mysqli($GLOBALS["serverHost"], $GLOBALS["serverUsername"], $GLOBALS["serverPassword"], $GLOBALS["database"]);
+	$stmt = $mysqli->prepare("SELECT message FROM vpamsg2 WHERE id = ?");
+	$stmt->bind_param("i", $editId);
+	$stmt->bind_result($msg);
+	$stmt->execute();
+	if($stmt->fetch()){
+		$notice = $msg;
+	}
+	$stmt->close();
+	$mysqli->close();
+	return $notice;
+  }
+  
+  //valideerimata sõnumite nimekiri
+  function readallunvalidatedmessages(){
+	$notice = "<ul> \n";
+	$mysqli = new mysqli($GLOBALS["serverHost"], $GLOBALS["serverUsername"], $GLOBALS["serverPassword"], $GLOBALS["database"]);
+	$stmt = $mysqli->prepare("SELECT id, message FROM vpamsg2 WHERE accepted IS NULL");
+	echo $mysqli->error;
+	$stmt->bind_result($msgid, $msg);
+	if($stmt->execute()){
+	  while($stmt->fetch()){
+		$notice .= "<li>" .$msg .'<br><a href="validatemessage.php?id=' .$msgid .'">Valideeri</a></li>' ."\n"; 
+	  }
+    } else {
+	  $notice .= "<li>Sõnumite lugemisel tekkis viga!" .$stmt->error ."</li> \n";
+	}
+	$notice .= "</ul> \n";
+	$stmt->close();
+	$mysqli->close();
+	return $notice;
+  }
+  
   //sisselogimine
   function signin($email, $password){
 	$notice = "";
