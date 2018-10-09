@@ -1,6 +1,22 @@
 <?php
   require("functions.php");
   
+    //kui pole sisse loginud
+  if(!isset($_SESSION["userId"])){
+	header("Location: index_2.php");
+    exit();	
+  }
+  
+  //välja logimine
+  if(isset($_GET["logout"])){
+	session_destroy();
+	header("Location: index_2.php");
+    exit();
+  }
+  
+  if(isset($_GET["id"])){
+	$msg = readmsgforvalidation($_GET["id"]);
+  }
 ?>
 <!DOCTYPE html>
 <html>
