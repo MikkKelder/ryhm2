@@ -6,6 +6,100 @@
   //kasutan sessiooni
   session_start();
   
+  //kõigi valideeritud sõnumite lugemine valideerija kaupa
+  function readallvalidatedmessagesbyuser(){
+	$msghtml ="";
+	$mysqli = new mysqli($GLOBALS["serverHost"], $GLOBALS["serverUsername"], $GLOBALS["serverPassword"], $GLOBALS["database"]);
+	$stmt = $mysqli->prepare("SELECT id, firstname, lastname FROM vpusers2");
+	echo $mysqli->error;
+	$stmt->bind_result($idFromDb, $firstnameFromDb, $lastnameFromDb);
+	
+	$stmt2 = $mysqli->prepare("SELECT message, accepted FROM vpamsg2 WHERE acceptedby=?");
+	$stmt2->bind_param("i", $idFromDb);
+	$stmt2->bind_result($msgFromDb, $acceptedFromDb);
+	
+	$stmt->execute();
+	//et saadud tulemus püsiks ja oleks kasutatav ka järgmises päringus ($stmt2)
+	$stmt->store_result();
+	
+	while($stmt->fetch()){
+	  $msghtml .= "<h3>" . $firstnameFromDb ." " .$lastnameFromDb ."</h3> \n";
+	  $stmt2->execute();
+	  while($stmt2->fetch()){
+		$msghtml .= "<p><b>";
+		if($acceptedFromDb == 1){
+		  $msghtml .= "Lubatud: ";
+		} else {
+		  $msghtml .= "Keelatud: ";
+		}
+		$msghtml .= "</b>" .$msgFromDb ."</p> \n";
+	  }//while $stmt2 fetch
+	}//while $stmt fetch
+	$stmt2->close();
+	$stmt->close();
+	$mysqli->close();
+	return $msghtml;
+  }
+  
+  //kasutajate nimekiri
+  function listusers(){
+	$notice = "";
+	$mysqli = new mysqli($GLOBALS["serverHost"], $GLOBALS["serverUsername"], $GLOBALS["serverPassword"], $GLOBALS["database"]);
+	$stmt = $mysqli->prepare("SELECT firstname, lastname, email FROM vpusers2 WHERE id !=?");
+	
+	echo $mysqli->error;
+	$stmt->bind_param("i", $_SESSION["userId"]);
+	$stmt->bind_result($firstname, $lastname, $email);
+	if($stmt->execute()){
+	  $notice .= "<ol> \n";
+	  while($stmt->fetch()){
+		  $notice .= "<li>" .$firstname ." " .$lastname .", kasutajatunnus: " .$email ."</li> \n";
+	  }
+	  $notice .= "</ol> \n";
+	} else {
+		$notice = "<p>Kasutajate nimekirja lugemisel tekkis tehniline viga! " .$stmt->error;
+	}
+	
+	$stmt->close();
+	$mysqli->close();
+	return $notice;
+  }
+  
+  function allvalidmessages(){
+	$html = "";
+	$valid = 1;
+	$mysqli = new mysqli($GLOBALS["serverHost"], $GLOBALS["serverUsername"], $GLOBALS["serverPassword"], $GLOBALS["database"]);
+	$stmt = $mysqli->prepare("SELECT message FROM vpamsg2 WHERE accepted=? ORDER BY accepttime DESC");
+	echo $mysqli->error;
+	$stmt->bind_param("i", $valid);
+	$stmt->bind_result($msg);
+	$stmt->execute();
+	while($stmt->fetch()){
+		$html .= "<p>" .$msg ."</p> \n";
+	}
+	$stmt->close();
+	$mysqli->close();
+	if(empty($html)){
+		$html = "<p>Kontrollitud sõnumeid pole.</p>";
+	}
+	return $html;
+  }
+  
+  function validatemsg($editId, $validation){
+	$mysqli = new mysqli($GLOBALS["serverHost"], $GLOBALS["serverUsername"], $GLOBALS["serverPassword"], $GLOBALS["database"]);
+	$stmt = $mysqli->prepare("UPDATE vpamsg2 SET acceptedby=?, accepted=?, accepttime=now() WHERE id=?");
+	$stmt->bind_param("iii", $_SESSION["userId"], $validation, $editId);
+	if($stmt->execute()){
+	  echo "Õnnestus";
+	  header("Location: validatemsg.php");
+	  exit();
+	} else {
+	  echo "Tekkis viga: " .$stmt->error;
+	}
+	$stmt->close();
+	$mysqli->close();
+  }
+  
   //valitud sõnumi lugemine valideerimiseks
   function readmsgforvalidation($editId){
 	$notice = "";

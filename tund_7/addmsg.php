@@ -22,6 +22,8 @@
   <h1>Sõnumi lisamine</h1>
   <p>Siin on minu <a href="http://www.tlu.ee">TLÜ</a> õppetöö raames valminud veebilehed. Need ei oma mingit sügavat sisu ja nende kopeerimine ei oma mõtet.</p>
   <hr>
+  <p><a href="main.php">Tagasi pealehele</a></p>
+  <hr>
   
   <form method="POST" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
     <label>Sõnum (max 256 märki):</label>

@@ -33,8 +33,10 @@
 	?>.
 	</p>
 	<ul>
-	  <li><a href="?logout=1">Logi välja!</a></li>
-	  <li><a href="validatemsg.php">Valideeri anonüümseid sõnumeid</a></li>
+	  <li><a href="?logout=1">Logi välja</a>!</li>
+	  <li>Süsteemi <a href="users.php">kasutajad</a>.</li>
+	  <li>Valideeri anonüümseid <a href="validatemsg.php">sõnumeid</a>.</li>
+	  <li>Vaata valideeritud <a href="validatedmessages.php">sõnumeid</a> valideerijate kaupa.</li>
 	</ul>
 	
   </body>
