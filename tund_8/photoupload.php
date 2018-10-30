@@ -61,17 +61,74 @@
 				echo "Kahjuks faili üles ei laeta!";
 			// if everything is ok, try to upload file
 			} else {
-				if (move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $target_file)) {
+				
+				//loome vastavalt failitüübile pildiobjekti
+				if($imageFileType == "jpg" or $imageFileType == "jpeg"){
+					$myTempImage = imagecreatefromjpeg($_FILES["fileToUpload"]["tmp_name"]);
+				}
+				if($imageFileType == "png"){
+					$myTempImage = imagecreatefrompng($_FILES["fileToUpload"]["tmp_name"]);
+				}
+				if($imageFileType == "gif"){
+					$myTempImage = imagecreatefromgif($_FILES["fileToUpload"]["tmp_name"]);
+				}
+				
+				$imageWidth = imagesx($myTempImage);
+				$imageHeight = imagesy($myTempImage);
+				//arvutan suuruse suhtarvu
+				if($imageWidth > $imageHeight){
+					$sizeRatio = $imageWidth / 600;
+				} else {
+					$sizeRatio = $imageHeight / 400;
+				}
+				
+				$newWidth = $imageWidth / $sizeRatio;
+				$newHeight = $imageHeight / $sizeRatio;
+				
+				$myImage = resizeImage($myTempImage, $imageWidth, $imageHeight, $newWidth, $newHeight);
+				
+				//lähtudes failitüübist, kirjutan pildifaili
+				if($imageFileType == "jpg" or $imageFileType == "jpeg"){
+					if(imagejpeg($myImage, $target_file, 95)){
+						echo "Fail " . basename( $_FILES["fileToUpload"]["name"]). " on edukalt üles laetud!";
+					} else {
+						echo "Vabandage, faili ülelaadimisel tekkis tehniline viga!";
+					}
+				}
+				if($imageFileType == "png"){
+					if(imagepng($myImage, $target_file, 6)){
+						echo "Fail " . basename( $_FILES["fileToUpload"]["name"]). " on edukalt üles laetud!";
+					} else {
+						echo "Vabandage, faili ülelaadimisel tekkis tehniline viga!";
+					}
+				}
+				if($imageFileType == "gif"){
+					if(imagegif($myImage, $target_file)){
+						echo "Fail " . basename( $_FILES["fileToUpload"]["name"]). " on edukalt üles laetud!";
+					} else {
+						echo "Vabandage, faili ülelaadimisel tekkis tehniline viga!";
+					}
+				}
+				
+				imagedestroy($myTempImage);
+				imagedestroy($myImage);
+				
+				
+/* 				if (move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $target_file)) {
 					echo "Fail " . basename( $_FILES["fileToUpload"]["name"]). " on edukalt üles laetud!";
 				} else {
 					echo "Vabandage, faili ülelaadimisel tekkis tehniline viga!";
-				}
+				} */
 			}
 			
 		}
 	}//kontroll, kas vajutati nuppu
 	
-	
+	function resizeImage($image, $ow, $oh, $w, $h){
+		$newImage = imagecreatetruecolor($w, $h);
+		imagecopyresampled($newImage, $image, 0, 0, 0, 0, $w, $h, $ow, $oh);
+		return $newImage;
+	}
   
   //lehe päise laadimine
   $pageTitle = "Fotode üleslaadimine";
