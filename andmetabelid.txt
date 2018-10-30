@@ -6,3 +6,7 @@ CREATE TABLE `if18_rinde`.`vpamsg2` ( `id` INT(11) NOT NULL AUTO_INCREMENT , `me
 Kasutajate tabel
 
 CREATE TABLE `if18_rinde`.`vpusers2` ( `id` INT(11) NOT NULL AUTO_INCREMENT , `firstname` VARCHAR(30) NOT NULL , `lastname` VARCHAR(30) NOT NULL , `birthdate` DATE NOT NULL , `gender` INT(1) NOT NULL , `email` VARCHAR(100) NOT NULL , `password` VARCHAR(60) NOT NULL , `created` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP , PRIMARY KEY (`id`)) ENGINE = InnoDB;
+
+Kasutajaprofiilid:
+
+CREATE TABLE `if18_rinde`.`vpuserprofiles2` ( `id` INT(11) NOT NULL AUTO_INCREMENT , `userid` INT(11) NOT NULL , `description` VARCHAR(2000) NULL , `bgcolor` VARCHAR(7) NULL , `txtcolor` VARCHAR(7) NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB;
