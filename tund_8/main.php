@@ -14,23 +14,12 @@
     exit();
   }
   
+  //lehe päise laadimine
+  $pageTitle = "Pealeht";
+  require("header.php");
 
 ?>
 
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8">
-	<title>Pealeht</title>
-	<style>
-	  <?php
-        echo "body{background-color: " .$_SESSION["bgColor"] ."; \n";
-		echo "color: " .$_SESSION["txtColor"] ."} \n";
-	  ?>
-	</style>
-  </head>
-  <body>
-    <h1>Pealeht</h1>
 	<p>See leht on valminud <a href="http://www.tlu.ee" target="_blank">TLÜ</a> õppetöö raames ja ei oma mingisugust, mõtestatud või muul moel väärtuslikku sisu.</p>
 	<hr>
 	<p>Olete sisse loginud nimega:
@@ -44,6 +33,7 @@
 	  <li>Süsteemi <a href="users.php">kasutajad</a>.</li>
 	  <li>Valideeri anonüümseid <a href="validatemsg.php">sõnumeid</a>.</li>
 	  <li>Vaata valideeritud <a href="validatedmessages.php">sõnumeid</a> valideerijate kaupa.</li>
+	  <li>Piltide <a href="photoupload.php">üleslaadimine</a>.</li>
 	</ul>
 	
   </body>
