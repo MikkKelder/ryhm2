@@ -107,9 +107,55 @@
 	return $profile;
   }
   
-  //kõigi valideeritud sõnumite lugemine valideerija kaupa
+  //väljastame kõik valideeritud sõnumid kasutajate kaupa
   function readallvalidatedmessagesbyuser(){
+	$msghtml = "";
+	$result = "";
+	$mysqli = new mysqli($GLOBALS["serverHost"], $GLOBALS["serverUsername"], $GLOBALS["serverPassword"], $GLOBALS["database"]);
+	$stmt = $mysqli->prepare("SELECT id, firstname, lastname FROM vpusers2");
+	echo $mysqli->error;
+	$stmt->bind_result($idFromDb, $firstnameFromDb, $lastnameFromDb);
+	$stmt2 = $mysqli->prepare("SELECT message, accepted FROM vpamsg2 WHERE acceptedby=?");
+	echo $mysqli->error;
+	$stmt2->bind_result($msgFromDb, $acceptedFromDb);
+	
+	$stmt->execute();
+	//järgmine käsk hoiab tulemust pikemalt kinni, et saaks ka järgmises käsus kasutada
+	$stmt->store_result();
+	
+	$stmt2->bind_param("i", $idFromDb);
+	
+	while($stmt->fetch()){
+		$msghtml .="<h3>" .$firstnameFromDb ." " .$lastnameFromDb ."</h3> \n";
+		$resultcounter = 0;
+		$stmt2->execute();
+		while($stmt2->fetch()){
+		  $msghtml .="<p>";
+		  if($acceptedFromDb == 0){
+			$msghtml .= "<b>Keelatud: </b>";
+		  } else {
+			$msghtml .= "<b>Lubatud: </b>";
+		  }
+		  $msghtml .=  $msgFromDb ."</p>\n";
+		  $resultcounter ++;
+		}
+		if($resultcounter > 0){
+		  $result .= $msghtml;
+		}
+		
+		$msghtml = "";
+	}
+	$stmt->free_result();
+	$stmt->close();
+	$stmt2->close();
+	$mysqli->close();
+	return $result;
+  }
+  
+  //kõigi valideeritud sõnumite lugemine valideerija kaupa
+  function readallvalidatedmessagesbyuser_vana(){
 	$msghtml ="";
+	$result = "";
 	$mysqli = new mysqli($GLOBALS["serverHost"], $GLOBALS["serverUsername"], $GLOBALS["serverPassword"], $GLOBALS["database"]);
 	$stmt = $mysqli->prepare("SELECT id, firstname, lastname FROM vpusers2");
 	echo $mysqli->error;
@@ -125,6 +171,7 @@
 	
 	while($stmt->fetch()){
 	  $msghtml .= "<h3>" . $firstnameFromDb ." " .$lastnameFromDb ."</h3> \n";
+	  $resultcounter = 0;
 	  $stmt2->execute();
 	  while($stmt2->fetch()){
 		$msghtml .= "<p><b>";
@@ -134,8 +181,15 @@
 		  $msghtml .= "Keelatud: ";
 		}
 		$msghtml .= "</b>" .$msgFromDb ."</p> \n";
+		$resultcounter ++;
 	  }//while $stmt2 fetch
+	  if($resultcounter > 0){
+		  $result .= $msghtml;
+		}
+		
+		$msghtml = "";
 	}//while $stmt fetch
+	$stmt->free_result();
 	$stmt2->close();
 	$stmt->close();
 	$mysqli->close();

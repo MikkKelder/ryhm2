@@ -16,21 +16,11 @@
   
   $msglist = readallunvalidatedmessages();
 
+  //lehe päise laadimine
+  $pageTitle = "Valideerimata sõnumid";
+  require("header.php");
 ?>
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <title>Anonüümsed sõnumid</title>
-  <style>
-	  <?php
-        echo "body{background-color: " .$_SESSION["bgColor"] ."; \n";
-		echo "color: " .$_SESSION["txtColor"] ."} \n";
-	  ?>
-	</style>
-</head>
-<body>
-  <h1>Sõnumid</h1>
+
   <p>Siin on minu <a href="http://www.tlu.ee">TLÜ</a> õppetöö raames valminud veebilehed. Need ei oma mingit sügavat sisu ja nende kopeerimine ei oma mõtet.</p>
   <hr>
   <ul>
