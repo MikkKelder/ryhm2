@@ -10,3 +10,7 @@ CREATE TABLE `if18_rinde`.`vpusers2` ( `id` INT(11) NOT NULL AUTO_INCREMENT , `f
 Kasutajaprofiilid:
 
 CREATE TABLE `if18_rinde`.`vpuserprofiles2` ( `id` INT(11) NOT NULL AUTO_INCREMENT , `userid` INT(11) NOT NULL , `description` VARCHAR(2000) NULL , `bgcolor` VARCHAR(7) NULL , `txtcolor` VARCHAR(7) NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB;
+
+Üleslaetavad fotod
+
+CREATE TABLE `if18_rinde`.`vpphotos2` ( `id` INT(11) NOT NULL AUTO_INCREMENT , `userid` INT(11) NOT NULL , `filename` VARCHAR(40) NOT NULL , `alttext` VARCHAR(256) NULL , `privacy` INT(1) NOT NULL , `created` DATE NOT NULL DEFAULT CURRENT_TIMESTAMP , `deleted` DATE NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB;
